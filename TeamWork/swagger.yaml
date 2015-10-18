@@ -7,7 +7,7 @@ host: 'none'
 produces:
 - 'application/json'
 paths:
-  /login:
+  /auth:
     post:
       description: |
         登陆，返回用户基本信息和验证TOKEN
@@ -22,6 +22,7 @@ paths:
           description: 密码
           required: true
           type: string
+          format: password
       responses:
         '200':
           description: 登陆成功
@@ -99,6 +100,11 @@ paths:
         required: true
         type: integer
         format: int64
+      - name: auth
+        in: query
+        description: 登陆获得的auth token
+        required: true
+        type: string
       responses:
         '200':
           description: deleted
@@ -115,11 +121,67 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/NewResume'
+      - name: auth
+        in: query
+        description: 登陆获得的auth token
+        required: true
+        type: string
       responses:
         '200':
           description: 简历详情
           schema:
             $ref: '#/definitions/Resume'
+        default:
+          description: unexpected error
+          schema:
+            $ref: "#/definitions/ErrorModel"
+  /job:
+    get:
+      description: 查找一个岗位的详情信息
+      parameters:
+      - name: id
+        in: query
+        description: 岗位id
+        required: true
+        type: integer
+        format: int64
+      responses:
+        '200':
+          description: 返回工作详情
+          schema:
+            $ref: '#/definitions/Job'
+        default:
+          description: unexpected error
+          schema:
+            $ref: "#/definitions/ErrorModel"
+  /jobs:
+    get:
+      description: 查找岗位
+      parameters:
+      - name: keyword
+        in: query
+        description: 关键字
+        required: false
+        type: string
+      - name: offset
+        in: query
+        description: 查找结果的偏移量（用来分页）
+        required: false
+        type: integer
+        format: int32
+      - name: max_result
+        in: query
+        description: 最多返回的结果
+        required: false
+        type: integer
+        format: int32
+      responses:
+        '200':
+          description: 返回搜索的所有岗位
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Job'
         default:
           description: unexpected error
           schema:
@@ -160,7 +222,8 @@ definitions:
       sign:
         type: string
       birthday:
-        type: date
+        type: string
+        format: date
       location:
         type: string
       sex: 
@@ -172,12 +235,12 @@ definitions:
     type: object
     required:
     - id
-    - userId
+    - user_id
     properties:
       id:
         type: integer
         format: int64
-      userId:
+      user_id:
         type: integer
         format: int64
       name:
@@ -191,10 +254,10 @@ definitions:
   NewResume:
     type: object
     required:
-    - userId
+    - user_id
     - name
     properties:
-      userId:
+      user_id:
         type: integer
         format: int64
       name:
@@ -205,6 +268,29 @@ definitions:
         type: string
       introduction:
         type: string
+  Job:
+    type: object
+    required:
+    - id
+    - name
+    properties:
+      id:
+        type: integer
+        format: int64
+      name:
+        type: string
+      salary:
+        type: string
+      description:
+        type: string
+      company_id:
+        type: integer
+        format: int64
+      company_name:
+        type: string
+      create_time:
+        type: string
+        format: date
   ErrorModel:
     type: "object"
     required:
