@@ -3,8 +3,9 @@ info:
   version: 0.0.1
   title: '大学生兼职测试api'
   description: '本api只用来给app进行测试用'
-host: 'http://localhost:3000'
+host: 'localhost:3000'
 basePath: '/'
+schemes: 'http'
 produces:
 - 'application/json'
 paths:
