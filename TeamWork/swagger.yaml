@@ -5,7 +5,7 @@ info:
   description: '本api只用来给app进行测试用'
 host: 'localhost:3000'
 basePath: '/'
-schemes: 'http'
+schemes: ['http']
 produces:
 - 'application/json'
 paths:
