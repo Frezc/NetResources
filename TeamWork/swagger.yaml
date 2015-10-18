@@ -3,7 +3,8 @@ info:
   version: 0.0.1
   title: '大学生兼职测试api'
   description: '本api只用来给app进行测试用'
-host: 'none'
+host: 'http://localhost:3000'
+basePath: '/'
 produces:
 - 'application/json'
 paths:
@@ -51,27 +52,6 @@ paths:
           description: unexpected error
           schema:
             $ref: "#/definitions/ErrorModel"
-  /resumelist:
-    get:
-      description: 得到用户的简历列表
-      parameters:
-      - name: id
-        in: query
-        description: 用户id
-        required: true
-        type: integer
-        format: int64
-      responses:
-        '200':
-          description: 用户的所有简历列表
-          schema:
-            type: array
-            items: 
-              $ref: '#/definitions/Resume'
-        default:
-          description: unexpected error
-          schema:
-            $ref: "#/definitions/ErrorModel"
   /resume:
     get:
       description: 得到某份简历
@@ -79,14 +59,22 @@ paths:
       - name: id
         in: query
         description: 简历id
-        required: true
+        required: false
+        type: integer
+        format: int64
+      - name: user_id
+        in: query
+        description: 用户id
+        required: yes
         type: integer
         format: int64
       responses:
         '200':
           description: 简历详情
           schema:
-            $ref: '#/definitions/Resume'
+            type: array
+            items: 
+              $ref: '#/definitions/Resume'
         default:
           description: unexpected error
           schema:
@@ -127,7 +115,7 @@ paths:
         required: true
         type: string
       responses:
-        '200':
+        '201':
           description: 简历详情
           schema:
             $ref: '#/definitions/Resume'
