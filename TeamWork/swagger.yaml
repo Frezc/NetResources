@@ -69,7 +69,7 @@ paths:
         - name: user_id
           in: query
           description: 用户id
-          required: 'yes'
+          required: true
           type: integer
           format: int64
       responses:
@@ -114,9 +114,8 @@ paths:
           in: formData
           description: 用户的id
           required: true
-          schema:
-            type: integer
-            format: int64
+          type: integer
+          format: int64
         - name: name
           in: formData
           description: 简历里的姓名
