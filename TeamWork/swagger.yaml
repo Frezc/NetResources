@@ -5,6 +5,8 @@ info:
   description: '本api只用来给app进行测试用'
 host: 'localhost:3000'
 basePath: '/'
+consumes:
+- "application/x-www-form-urlencoded"
 produces:
 - 'application/json'
 paths:
@@ -102,13 +104,30 @@ paths:
             $ref: "#/definitions/ErrorModel"
     post:
       description: 添加简历
+      comsumes:
+      - "application/x-www-form-urlencoded"
+      - "multipart/form-data"
       parameters:
-      - name: resume
+      - name: user_id
         in: body
-        description: 添加的简历
+        description: 用户的id
         required: true
-        schema:
-          $ref: '#/definitions/NewResume'
+      - name: name
+        in: body
+        description: 简历里的姓名
+        required: false
+      - name: school
+        in: body
+        description: 学校
+        required: false
+      - name: introduction
+        in: body
+        description: 简介
+        required: false  
+      - name: photo
+        in: body
+        description: 简历的照片文件
+        required: false
       - name: auth
         in: query
         description: 登陆获得的auth token
