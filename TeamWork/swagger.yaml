@@ -5,7 +5,6 @@ info:
   description: '本api只用来给app进行测试用'
 host: 'localhost:3000'
 basePath: '/'
-schemes: ['http']
 produces:
 - 'application/json'
 paths:
@@ -126,28 +125,15 @@ paths:
             $ref: "#/definitions/ErrorModel"
   /job:
     get:
-      description: 查找一个岗位的详情信息
+      description: 查找岗位
       parameters:
       - name: id
         in: query
         description: 岗位id
-        required: true
+        required: false
         type: integer
         format: int64
-      responses:
-        '200':
-          description: 返回工作详情
-          schema:
-            $ref: '#/definitions/Job'
-        default:
-          description: unexpected error
-          schema:
-            $ref: "#/definitions/ErrorModel"
-  /jobs:
-    get:
-      description: 查找岗位
-      parameters:
-      - name: keyword
+      - name: q
         in: query
         description: 关键字
         required: false
@@ -166,7 +152,7 @@ paths:
         format: int32
       responses:
         '200':
-          description: 返回搜索的所有岗位
+          description: 返回搜索的所有岗位(如果确定了id,则无视其他参数)
           schema:
             type: array
             items:
@@ -175,6 +161,45 @@ paths:
           description: unexpected error
           schema:
             $ref: "#/definitions/ErrorModel"
+  /company:
+    get:
+      description: 公司信息
+      parameters:
+      - name: id
+        in: query
+        description: 岗位id
+        required: false
+        type: integer
+        format: int64
+      - name: q
+        in: query
+        description: 关键字
+        required: false
+        type: string
+      - name: offset
+        in: query
+        description: 查找结果的偏移量（用来分页）
+        required: false
+        type: integer
+        format: int32
+      - name: max_result
+        in: query
+        description: 最多返回的结果
+        required: false
+        type: integer
+        format: int32
+      responses:
+        '200':
+          description: 返回搜索的所有公司信息(如果确定了id,则无视其他参数)
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Company'
+        default:
+          description: unexpected error
+          schema:
+            $ref: "#/definitions/ErrorModel"
+    
 definitions:
   User:
     type: 'object'
@@ -280,6 +305,27 @@ definitions:
       create_time:
         type: string
         format: date
+  Company:
+    type: object
+    required:
+    - id
+    - name
+    properties:
+      id:
+        type: integer
+        format: int64
+      name: 
+        type: string
+      url: 
+        type: string
+      address: 
+        type: string
+      logo:
+        type: string
+      description:
+        type: string
+      leader:
+        type: string
   ErrorModel:
     type: "object"
     required:
