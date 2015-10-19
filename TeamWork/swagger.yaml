@@ -1,6 +1,6 @@
 swagger: '2.0'
 info:
-  version: 0.0.1
+  version: 0.1.0
   title: '大学生兼职测试api'
   description: '本api只用来给app进行测试用'
 host: 'localhost:3000'
@@ -112,22 +112,28 @@ paths:
         in: body
         description: 用户的id
         required: true
+        type: integer
+        format: int64
       - name: name
         in: body
         description: 简历里的姓名
         required: false
+        type: string
       - name: school
         in: body
         description: 学校
         required: false
+        type: string
       - name: introduction
         in: body
         description: 简介
-        required: false  
+        required: false 
+        type: string
       - name: photo
         in: body
         description: 简历的照片文件
         required: false
+        type: string
       - name: auth
         in: query
         description: 登陆获得的auth token
@@ -135,7 +141,7 @@ paths:
         type: string
       responses:
         '201':
-          description: 简历详情
+          description: resume created
           schema:
             $ref: '#/definitions/Resume'
         default:
