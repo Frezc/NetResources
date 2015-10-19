@@ -1,14 +1,16 @@
 swagger: '2.0'
 info:
-  version: 0.1.0
-  title: '大学生兼职测试api'
-  description: '本api只用来给app进行测试用'
+  version: 0.1.1
+  title: 大学生兼职测试api
+  description: 本api只用来给app进行测试用
 host: 'localhost:3000'
-basePath: '/'
+basePath: /
+schemes:
+  - http
 consumes:
-- "application/x-www-form-urlencoded"
+  - application/x-www-form-urlencoded
 produces:
-- 'application/json'
+  - application/json
 paths:
   /auth:
     post:
@@ -34,17 +36,17 @@ paths:
         default:
           description: 登陆失败
           schema:
-            $ref: "#/definitions/ErrorModel"
-  /user:
+            $ref: '#/definitions/ErrorModel'
+  '/user/{id}':
     get:
       description: 得到某个用户的信息(如果需要登陆的话要参数要带上authtoken)
       parameters:
-      - name: id
-        in: query
-        description: 用户的id
-        required: true
-        type: integer
-        format: int64
+        - name: id
+          in: path
+          description: 用户的id
+          required: true
+          type: integer
+          format: int64
       responses:
         '200':
           description: 找到用户
@@ -53,92 +55,94 @@ paths:
         default:
           description: unexpected error
           schema:
-            $ref: "#/definitions/ErrorModel"
+            $ref: '#/definitions/ErrorModel'
   /resume:
     get:
       description: 得到某份简历
       parameters:
-      - name: id
-        in: query
-        description: 简历id
-        required: false
-        type: integer
-        format: int64
-      - name: user_id
-        in: query
-        description: 用户id
-        required: yes
-        type: integer
-        format: int64
+        - name: id
+          in: query
+          description: 简历id
+          required: false
+          type: integer
+          format: int64
+        - name: user_id
+          in: query
+          description: 用户id
+          required: 'yes'
+          type: integer
+          format: int64
       responses:
         '200':
           description: 简历详情
           schema:
             type: array
-            items: 
+            items:
               $ref: '#/definitions/Resume'
         default:
           description: unexpected error
           schema:
-            $ref: "#/definitions/ErrorModel"
+            $ref: '#/definitions/ErrorModel'
     delete:
       description: 删除简历
       parameters:
-      - name: id
-        in: query
-        description: 简历id
-        required: true
-        type: integer
-        format: int64
-      - name: auth
-        in: query
-        description: 登陆获得的auth token
-        required: true
-        type: string
+        - name: id
+          in: query
+          description: 简历id
+          required: true
+          type: integer
+          format: int64
+        - name: auth
+          in: query
+          description: 登陆获得的auth token
+          required: true
+          type: string
       responses:
         '200':
           description: deleted
         default:
           description: unexpected error
           schema:
-            $ref: "#/definitions/ErrorModel"
+            $ref: '#/definitions/ErrorModel'
     post:
       description: 添加简历
-      comsumes:
-      - "application/x-www-form-urlencoded"
-      - "multipart/form-data"
+      consumes:
+        - application/x-www-form-urlencoded
+        - multipart/form-data
       parameters:
-      - name: user_id
-        in: body
-        description: 用户的id
-        required: true
-        type: integer
-        format: int64
-      - name: name
-        in: body
-        description: 简历里的姓名
-        required: false
-        type: string
-      - name: school
-        in: body
-        description: 学校
-        required: false
-        type: string
-      - name: introduction
-        in: body
-        description: 简介
-        required: false 
-        type: string
-      - name: photo
-        in: body
-        description: 简历的照片文件
-        required: false
-        type: string
-      - name: auth
-        in: query
-        description: 登陆获得的auth token
-        required: true
-        type: string
+        - name: user_id
+          in: formData
+          description: 用户的id
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: name
+          in: formData
+          description: 简历里的姓名
+          required: false
+          type: string
+        - name: school
+          in: formData
+          description: 学校
+          required: false
+          type: string
+        - name: introduction
+          in: formData
+          description: 简介
+          required: false
+          type: string
+        - name: photo
+          in: formData
+          description: 简历的照片文件
+          required: false
+          type: string
+          format: byte
+        - name: auth
+          in: query
+          description: 登陆获得的auth token
+          required: true
+          type: string
       responses:
         '201':
           description: resume created
@@ -147,37 +151,37 @@ paths:
         default:
           description: unexpected error
           schema:
-            $ref: "#/definitions/ErrorModel"
+            $ref: '#/definitions/ErrorModel'
   /job:
     get:
       description: 查找岗位
       parameters:
-      - name: id
-        in: query
-        description: 岗位id
-        required: false
-        type: integer
-        format: int64
-      - name: q
-        in: query
-        description: 关键字
-        required: false
-        type: string
-      - name: offset
-        in: query
-        description: 查找结果的偏移量（用来分页）
-        required: false
-        type: integer
-        format: int32
-      - name: max_result
-        in: query
-        description: 最多返回的结果
-        required: false
-        type: integer
-        format: int32
+        - name: id
+          in: query
+          description: 岗位id
+          required: false
+          type: integer
+          format: int64
+        - name: q
+          in: query
+          description: 关键字
+          required: false
+          type: string
+        - name: offset
+          in: query
+          description: 查找结果的偏移量（用来分页）
+          required: false
+          type: integer
+          format: int32
+        - name: max_result
+          in: query
+          description: 最多返回的结果
+          required: false
+          type: integer
+          format: int32
       responses:
         '200':
-          description: 返回搜索的所有岗位(如果确定了id,则无视其他参数)
+          description: '返回搜索的所有岗位(如果确定了id,则无视其他参数)'
           schema:
             type: array
             items:
@@ -185,37 +189,37 @@ paths:
         default:
           description: unexpected error
           schema:
-            $ref: "#/definitions/ErrorModel"
+            $ref: '#/definitions/ErrorModel'
   /company:
     get:
       description: 公司信息
       parameters:
-      - name: id
-        in: query
-        description: 岗位id
-        required: false
-        type: integer
-        format: int64
-      - name: q
-        in: query
-        description: 关键字
-        required: false
-        type: string
-      - name: offset
-        in: query
-        description: 查找结果的偏移量（用来分页）
-        required: false
-        type: integer
-        format: int32
-      - name: max_result
-        in: query
-        description: 最多返回的结果
-        required: false
-        type: integer
-        format: int32
+        - name: id
+          in: query
+          description: 岗位id
+          required: false
+          type: integer
+          format: int64
+        - name: q
+          in: query
+          description: 关键字
+          required: false
+          type: string
+        - name: offset
+          in: query
+          description: 查找结果的偏移量（用来分页）
+          required: false
+          type: integer
+          format: int32
+        - name: max_result
+          in: query
+          description: 最多返回的结果
+          required: false
+          type: integer
+          format: int32
       responses:
         '200':
-          description: 返回搜索的所有公司信息(如果确定了id,则无视其他参数)
+          description: '返回搜索的所有公司信息(如果确定了id,则无视其他参数)'
           schema:
             type: array
             items:
@@ -223,31 +227,30 @@ paths:
         default:
           description: unexpected error
           schema:
-            $ref: "#/definitions/ErrorModel"
-    
+            $ref: '#/definitions/ErrorModel'
 definitions:
   User:
-    type: 'object'
+    type: object
     required:
-    - email
-    - id
-    - auth
+      - email
+      - id
+      - auth
     properties:
       id:
-        type: 'integer'
-        format: 'int64'
+        type: integer
+        format: int64
       email:
-        type: 'string'
+        type: string
       nickname:
-        type: 'string'
+        type: string
       avatar:
-        type: 'string'
+        type: string
       auth:
-        type: 'string'
+        type: string
   UserDetail:
     type: object
     required:
-    - id
+      - id
     properties:
       id:
         type: integer
@@ -265,16 +268,16 @@ definitions:
         format: date
       location:
         type: string
-      sex: 
+      sex:
         type: integer
         format: int32
-      contact: 
+      contact:
         type: string
   Resume:
     type: object
     required:
-    - id
-    - user_id
+      - id
+      - user_id
     properties:
       id:
         type: integer
@@ -293,8 +296,8 @@ definitions:
   NewResume:
     type: object
     required:
-    - user_id
-    - name
+      - user_id
+      - name
     properties:
       user_id:
         type: integer
@@ -310,8 +313,8 @@ definitions:
   Job:
     type: object
     required:
-    - id
-    - name
+      - id
+      - name
     properties:
       id:
         type: integer
@@ -333,17 +336,17 @@ definitions:
   Company:
     type: object
     required:
-    - id
-    - name
+      - id
+      - name
     properties:
       id:
         type: integer
         format: int64
-      name: 
+      name:
         type: string
-      url: 
+      url:
         type: string
-      address: 
+      address:
         type: string
       logo:
         type: string
@@ -352,14 +355,13 @@ definitions:
       leader:
         type: string
   ErrorModel:
-    type: "object"
+    type: object
     required:
-    - "code"
-    - "message"
+      - code
+      - message
     properties:
       code:
-        type: "integer"
-        format: "int32"
+        type: integer
+        format: int32
       message:
-        type: "string"
-      
+        type: string
