@@ -1,9 +1,9 @@
 swagger: '2.0'
 info:
-  version: 0.1.1
+  version: 0.2.0
   title: 大学生兼职测试api
   description: 本api只用来给app进行测试用
-host: 'localhost:3000'
+host: api.frezc.com
 basePath: /
 schemes:
   - http
@@ -32,14 +32,14 @@ paths:
         '200':
           description: 登陆成功
           schema:
-            $ref: '#/definitions/User'
+            $ref: '#/definitions/Auth'
         default:
           description: 登陆失败
           schema:
             $ref: '#/definitions/ErrorModel'
   '/user/{id}':
     get:
-      description: 得到某个用户的信息(如果需要登陆的话要参数要带上authtoken)
+      description: 得到某个用户的信息
       parameters:
         - name: id
           in: path
@@ -51,7 +51,31 @@ paths:
         '200':
           description: 找到用户
           schema:
-            $ref: '#/definitions/UserDetail'
+            $ref: '#/definitions/User'
+        default:
+          description: unexpected error
+          schema:
+            $ref: '#/definitions/ErrorModel'
+  /avatar:
+    post:
+      description: 更新用户头像
+      parameters:
+        - name: token
+          in: query
+          description: 登陆得到的token
+          required: true
+          type: string
+        - name: avatar
+          in: formData
+          description: 简历的照片文件
+          required: true
+          type: string
+          format: byte
+      responses:
+        '200':
+          description: 修改成功,返回头像的url
+          schema:
+            type: string
         default:
           description: unexpected error
           schema:
@@ -66,12 +90,11 @@ paths:
           required: false
           type: integer
           format: int64
-        - name: user_id
+        - name: token
           in: query
-          description: 用户id
+          description: 登陆得到的token
           required: true
-          type: integer
-          format: int64
+          type: string
       responses:
         '200':
           description: 简历详情
@@ -92,14 +115,16 @@ paths:
           required: true
           type: integer
           format: int64
-        - name: auth
+        - name: token
           in: query
-          description: 登陆获得的auth token
+          description: 登陆获得的token
           required: true
           type: string
       responses:
         '200':
           description: deleted
+          schema:
+            type: string
         default:
           description: unexpected error
           schema:
@@ -110,16 +135,10 @@ paths:
         - application/x-www-form-urlencoded
         - multipart/form-data
       parameters:
-        - name: user_id
-          in: formData
-          description: 用户的id
-          required: true
-          type: integer
-          format: int64
         - name: name
           in: formData
           description: 简历里的姓名
-          required: false
+          required: true
           type: string
         - name: school
           in: formData
@@ -137,7 +156,7 @@ paths:
           required: false
           type: string
           format: byte
-        - name: auth
+        - name: token
           in: query
           description: 登陆获得的auth token
           required: true
@@ -233,44 +252,41 @@ definitions:
     required:
       - email
       - id
-      - auth
+      - nickname
     properties:
       id:
         type: integer
         format: int64
       email:
         type: string
-      nickname:
-        type: string
-      avatar:
-        type: string
-      auth:
-        type: string
-  UserDetail:
-    type: object
-    required:
-      - id
-    properties:
-      id:
-        type: integer
-        format: int64
-      email:
-        type: string
+        format: email
       nickname:
         type: string
       avatar:
         type: string
       sign:
         type: string
-      birthday:
+      birthday: 
         type: string
         format: date
       location:
         type: string
-      sex:
+      sex: 
         type: integer
-        format: int32
       contact:
+        type: string
+      created_at:
+        type: string
+        format: date
+      updated_at:
+        type: string
+        format: date
+  Auth:
+    type: object
+    properties:
+      user:
+        $ref: '#/definitions/User'
+      token:
         type: string
   Resume:
     type: object
@@ -291,6 +307,19 @@ definitions:
       school:
         type: string
       introduction:
+        type: string
+      create_time:
+        type: string
+        format: date
+      birth_day:
+        type: string
+        format: date
+      location:
+        type: string
+      sex:
+        type: integer
+        format: int32
+      contact:
         type: string
   NewResume:
     type: object
@@ -355,12 +384,11 @@ definitions:
         type: string
   ErrorModel:
     type: object
-    required:
-      - code
-      - message
     properties:
-      code:
+      status_code:
         type: integer
         format: int32
       message:
+        type: string
+      error:
         type: string
