@@ -1,6 +1,6 @@
 swagger: '2.0'
 info:
-  version: 0.2.2
+  version: 0.2.3
   title: 大学生兼职测试api
   description: 本api只用来给app进行测试用
 host: api.frezc.com
@@ -37,7 +37,7 @@ paths:
           description: 登陆失败
           schema:
             $ref: '#/definitions/ErrorModel'
-  '/user/{id}':
+  /user/{id}:
     get:
       description: 得到某个用户的信息
       parameters:
@@ -265,7 +265,7 @@ paths:
       description: 查找岗位
       parameters:
         - name: id
-          in: query
+          in: path
           description: 岗位id
           required: true
           type: integer
@@ -316,7 +316,7 @@ paths:
       description: 公司信息
       parameters:
         - name: id
-          in: query
+          in: path
           description: 岗位id
           required: true
           type: integer
