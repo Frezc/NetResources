@@ -1,6 +1,6 @@
 swagger: '2.0'
 info:
-  version: 0.2.0
+  version: 0.2.2
   title: 大学生兼职测试api
   description: 本api只用来给app进行测试用
 host: api.frezc.com
@@ -106,7 +106,8 @@ paths:
           description: unexpected error
           schema:
             $ref: '#/definitions/ErrorModel'
-    delete:
+  /resume/delete:
+    post:
       description: 删除简历
       parameters:
         - name: id
@@ -129,12 +130,17 @@ paths:
           description: unexpected error
           schema:
             $ref: '#/definitions/ErrorModel'
+  /resume/add:
     post:
       description: 添加简历
       consumes:
-        - application/x-www-form-urlencoded
         - multipart/form-data
       parameters:
+        - name: title
+          in: formData
+          description: 简历标题
+          required: true
+          type: string
         - name: name
           in: formData
           description: 简历里的姓名
@@ -156,6 +162,22 @@ paths:
           required: false
           type: string
           format: byte
+        - name: birthday
+          in: formData
+          description: 生日
+          required: false
+          type: string
+          format: date
+        - name: contact
+          in: formData
+          description: 联系方式
+          required: false
+          type: string
+        - name: expect_location
+          in: formData
+          description: 期望工作地点
+          required: false
+          type: string
         - name: token
           in: query
           description: 登陆获得的auth token
@@ -170,20 +192,101 @@ paths:
           description: unexpected error
           schema:
             $ref: '#/definitions/ErrorModel'
-  /job:
+  /resume/update:
+    post:
+      description: 修改简历
+      consumes:
+        - multipart/form-data
+      parameters:
+        - name: title
+          in: formData
+          description: 简历标题
+          required: false
+          type: string
+        - name: name
+          in: formData
+          description: 简历里的姓名
+          required: false
+          type: string
+        - name: school
+          in: formData
+          description: 学校
+          required: false
+          type: string
+        - name: introduction
+          in: formData
+          description: 简介
+          required: false
+          type: string
+        - name: photo
+          in: formData
+          description: 简历的照片文件
+          required: false
+          type: string
+          format: byte
+        - name: birthday
+          in: formData
+          description: 生日
+          required: false
+          type: string
+          format: date
+        - name: contact
+          in: formData
+          description: 联系方式
+          required: false
+          type: string
+        - name: expect_location
+          in: formData
+          description: 期望工作地点
+          required: false
+          type: string
+        - name: id
+          description: 要修改简历的id
+          in: query
+          required: true
+          type: integer
+          format: int64
+        - name: token
+          in: query
+          description: 登陆获得的auth token
+          required: true
+          type: string
+      responses:
+        '200':
+          description: resume updated
+          schema:
+            $ref: '#/definitions/Resume'
+        default:
+          description: unexpected error
+          schema:
+            $ref: '#/definitions/ErrorModel'
+  /job/{id}:
     get:
       description: 查找岗位
       parameters:
         - name: id
           in: query
           description: 岗位id
-          required: false
+          required: true
           type: integer
           format: int64
+      responses:
+        '200':
+          description: '返回岗位详情'
+          schema:
+            $ref: '#/definitions/Job'
+        default:
+          description: unexpected error
+          schema:
+            $ref: '#/definitions/ErrorModel'
+  /job/query:
+    get:
+      description: 查找岗位
+      parameters:
         - name: q
           in: query
-          description: 关键字
-          required: false
+          description: 关键字(用空格分开)
+          required: true
           type: string
         - name: offset
           in: query
@@ -199,7 +302,7 @@ paths:
           format: int32
       responses:
         '200':
-          description: '返回搜索的所有岗位(如果确定了id,则无视其他参数)'
+          description: '返回搜索的所有岗位'
           schema:
             type: array
             items:
@@ -208,20 +311,33 @@ paths:
           description: unexpected error
           schema:
             $ref: '#/definitions/ErrorModel'
-  /company:
+  /company/{id}:
     get:
       description: 公司信息
       parameters:
         - name: id
           in: query
           description: 岗位id
-          required: false
+          required: true
           type: integer
           format: int64
+      responses:
+        '200':
+          description: '返回公司的详情信息'
+          schema:
+            $ref: '#/definitions/Company'
+        default:
+          description: unexpected error
+          schema:
+            $ref: '#/definitions/ErrorModel'
+  /company/query:
+    get:
+      description: 搜索公司
+      parameters:
         - name: q
           in: query
-          description: 关键字
-          required: false
+          description: 关键字(用空格分开)
+          required: true
           type: string
         - name: offset
           in: query
@@ -237,7 +353,7 @@ paths:
           format: int32
       responses:
         '200':
-          description: '返回搜索的所有公司信息(如果确定了id,则无视其他参数)'
+          description: '返回搜索的所有公司信息'
           schema:
             type: array
             items:
@@ -321,23 +437,12 @@ definitions:
         format: int32
       contact:
         type: string
-  NewResume:
-    type: object
-    required:
-      - user_id
-      - name
-    properties:
-      user_id:
-        type: integer
-        format: int64
-      name:
+      created_at:
         type: string
-      photo:
+        format: date
+      updated_at:
         type: string
-      school:
-        type: string
-      introduction:
-        type: string
+        format: date
   Job:
     type: object
     required:
@@ -353,12 +458,19 @@ definitions:
         type: string
       description:
         type: string
+      number:
+        type: integer
+      number_applied:
+        type: integer
       company_id:
         type: integer
         format: int64
       company_name:
         type: string
-      create_time:
+      created_at:
+        type: string
+        format: date
+      updated_at:
         type: string
         format: date
   Company:
@@ -382,6 +494,12 @@ definitions:
         type: string
       leader:
         type: string
+      created_at:
+        type: string
+        format: date
+      updated_at:
+        type: string
+        format: date
   ErrorModel:
     type: object
     properties:
