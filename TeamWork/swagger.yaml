@@ -1,6 +1,6 @@
 swagger: '2.0'
 info:
-  version: 0.2.4
+  version: 0.2.5
   title: 大学生兼职测试api
   description: 本api只用来给app进行测试用
 host: api.frezc.com
@@ -37,7 +37,7 @@ paths:
           description: 登陆失败
           schema:
             $ref: '#/definitions/ErrorModel'
-  /user/{id}:
+  '/user/{id}':
     get:
       description: 得到某个用户的信息
       parameters:
@@ -73,7 +73,7 @@ paths:
           format: byte
       responses:
         '200':
-          description: 修改成功,返回头像的url
+          description: '修改成功,返回头像的url'
           schema:
             type: string
         default:
@@ -260,7 +260,7 @@ paths:
           description: unexpected error
           schema:
             $ref: '#/definitions/ErrorModel'
-  /job/{id}:
+  '/job/{id}':
     get:
       description: 查找岗位
       parameters:
@@ -272,7 +272,7 @@ paths:
           format: int64
       responses:
         '200':
-          description: '返回岗位详情'
+          description: 返回岗位详情
           schema:
             $ref: '#/definitions/Job'
         default:
@@ -290,12 +290,12 @@ paths:
           type: string
         - name: orderby
           in: query
-          description: 按某列进行排序(id, created_at, number), 默认id
+          description: '按某列进行排序(id, created_at, number), 默认id'
           required: false
           type: string
         - name: direction
           in: query
-          description: 升序('asc')or降序('desc'), 默认升序
+          description: "升序('asc')or降序('desc'), 默认升序"
           required: false
           type: string
         - name: offset
@@ -312,7 +312,7 @@ paths:
           format: int32
       responses:
         '200':
-          description: '返回搜索的所有岗位'
+          description: 返回搜索的所有岗位
           schema:
             type: array
             items:
@@ -321,7 +321,78 @@ paths:
           description: unexpected error
           schema:
             $ref: '#/definitions/ErrorModel'
-  /company/{id}:
+  /job/apply:
+    get:
+      description: 申请中的岗位
+      parameters:
+        - name: token
+          in: query
+          description: 登陆获得的auth token
+          required: true
+          type: string
+        - name: direction
+          in: query
+          description: "按时间升序('asc')or降序('desc'), 默认升序"
+          required: false
+          type: string
+        - name: offset
+          in: query
+          description: 查找结果的偏移量（用来分页）
+          required: false
+          type: integer
+          format: int32
+        - name: limit
+          in: query
+          description: 最多返回的结果
+          required: true
+          type: integer
+          format: int32
+      responses:
+        '200':
+          description: 返回搜索的所有岗位申请
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/JobApply'
+        default:
+          description: unexpected error
+          schema:
+            $ref: '#/definitions/ErrorModel'
+    post:
+      description: 创建申请
+      parameters:
+        - name: token
+          in: query
+          description: 登陆获得的auth token
+          required: true
+          type: string
+        - name: job_id
+          in: formData
+          description: 申请的岗位id
+          required: true
+          type: integer
+          format: int64
+        - name: resume_id
+          in: formData
+          description: 使用的简历id
+          required: true
+          type: integer
+          format: int64
+        - name: description
+          in: formData
+          description: 申请时的描述
+          required: false
+          type: string
+      responses:
+        '200':
+          description: 返回搜索的所有岗位申请
+          schema:
+            $ref: '#/definitions/JobApply'
+        default:
+          description: unexpected error
+          schema:
+            $ref: '#/definitions/ErrorModel'
+  '/company/{id}':
     get:
       description: 公司信息
       parameters:
@@ -333,7 +404,7 @@ paths:
           format: int64
       responses:
         '200':
-          description: '返回公司的详情信息'
+          description: 返回公司的详情信息
           schema:
             $ref: '#/definitions/Company'
         default:
@@ -351,17 +422,17 @@ paths:
           type: string
         - name: orderby
           in: query
-          description: 按某列进行排序(id, created_at), 默认id
+          description: '按某列进行排序(id, created_at), 默认id'
           required: false
           type: string
         - name: direction
           in: query
-          description: 升序('asc')or降序('desc'), 默认升序
+          description: "升序('asc')or降序('desc'), 默认升序"
           required: false
           type: string
         - name: offset
           in: query
-          description: 查找结果的偏移量(用来分页), 
+          description: '查找结果的偏移量(用来分页),'
           required: false
           type: integer
           format: int32
@@ -373,7 +444,7 @@ paths:
           format: int32
       responses:
         '200':
-          description: '返回搜索的所有公司信息'
+          description: 返回搜索的所有公司信息
           schema:
             type: array
             items:
@@ -402,12 +473,12 @@ definitions:
         type: string
       sign:
         type: string
-      birthday: 
+      birthday:
         type: string
         format: date
       location:
         type: string
-      sex: 
+      sex:
         type: integer
       contact:
         type: string
@@ -482,6 +553,10 @@ definitions:
         type: integer
       number_applied:
         type: integer
+      visited:
+        type: integer
+      time:
+        type: string
       company_id:
         type: integer
         format: int64
@@ -491,6 +566,24 @@ definitions:
         type: string
         format: date
       updated_at:
+        type: string
+        format: date
+  JobApply:
+    type: object
+    properties:
+      job_id:
+        type: integer
+        format: int64
+      job_name:
+        type: string
+      resume_id:
+        type: integer
+        format: int64
+      resume_name:
+        type: string
+      description:
+        type: string
+      apply_time:
         type: string
         format: date
   Company:
