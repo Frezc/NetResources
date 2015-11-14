@@ -1,6 +1,6 @@
 swagger: '2.0'
 info:
-  version: 0.3.0
+  version: 0.3.1
   title: 大学生兼职测试api
   description: 本api只用来给app进行测试用
 host: api.frezc.com
@@ -48,6 +48,10 @@ paths:
           type: string
       responses:
         '200':
+          headers:
+            Authorization:
+              description: 返回的新token，格式为 Bearer {NEWTOKEN}
+              type: string
           description: 返回新token
           schema:
             type: string
