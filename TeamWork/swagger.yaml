@@ -1,6 +1,6 @@
 swagger: '2.0'
 info:
-  version: 0.3.1
+  version: 0.4.0
   title: 大学生兼职测试api
   description: 本api只用来给app进行测试用
 host: api.frezc.com
@@ -415,6 +415,113 @@ paths:
           description: unexpected error
           schema:
             $ref: '#/definitions/ErrorModel'
+  /job/completed:
+    get:
+      description: 已完成的工作
+      parameters:
+        - name: token
+          in: query
+          description: 登陆获得的auth token
+          required: true
+          type: string
+        - name: is_evaluated
+          in: query
+          description: 是否已评价(0:未评价, 1:已评价)
+          required: false
+          type: integer
+        - name: direction
+          in: query
+          description: "按时间升序('asc')or降序('desc'), 默认升序"
+          required: false
+          type: string
+        - name: offset
+          in: query
+          description: 查找结果的偏移量（用来分页）
+          required: false
+          type: integer
+          format: int32
+        - name: limit
+          in: query
+          description: 最多返回的结果
+          required: true
+          type: integer
+          format: int32
+      responses:
+        '200':
+          description: 返回搜索的所有已完成岗位
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/JobCompleted'
+        default:
+          description: unexpected error
+          schema:
+            $ref: '#/definitions/ErrorModel'
+  /job/evaluate:
+    get: 
+      description: 得到岗位的评价
+      parameters:
+        - name: job_id
+          in: query
+          description: 岗位id
+          required: true
+          type: integer
+        - name: offset
+          in: query
+          description: 查找结果的偏移量（用来分页）
+          required: false
+          type: integer
+          format: int32
+        - name: limit
+          in: query
+          description: 最多返回的结果
+          required: true
+          type: integer
+          format: int32
+      responses:
+        '200':
+          description: 查找到的评价
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Evaluate'
+        default:
+          description: unexpected error
+          schema:
+            $ref: '#/definitions/ErrorModel'
+    post:
+      description: 评价岗位
+      parameters:
+        - name: token
+          in: query
+          description: 登陆获得的auth token
+          required: true
+          type: string
+        - name: job_completed_id
+          in: query
+          description: 完成的工作id
+          required: true
+          type: integer
+        - name: score
+          in: formData
+          description: 评分(0~5)
+          required: true
+          type: integer
+        - name: comment
+          in: formData
+          description: 评论
+          required: false
+          type: string
+      responses:
+        '200':
+          description: 评价成功
+          schema:
+            type: string
+        default:
+          description: unexpected error
+          schema:
+            $ref: '#/definitions/ErrorModel'
+      
   '/company/{id}':
     get:
       description: 公司信息
@@ -578,6 +685,10 @@ definitions:
         type: integer
       visited:
         type: integer
+      number_evaluate:
+        type: integer
+      average_score:
+        type: integer
       time:
         type: string
       company_id:
@@ -585,6 +696,8 @@ definitions:
         format: int64
       company_name:
         type: string
+      active:
+        type: integer
       created_at:
         type: string
         format: date
@@ -614,6 +727,54 @@ definitions:
         type: string
       status:
         type: integer
+      created_at:
+        type: string
+        format: date
+      updated_at:
+        type: string
+        format: date
+  JobCompleted:
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int64
+      user_id:
+        type: integer
+        format: int64
+      job_id:
+        type: integer
+        format: int64
+      job_name:
+        type: string
+      resume_id:
+        type: integer
+        format: int64
+      resume_name:
+        type: string
+      description:
+        type: string
+      is_evaluated:
+        type: integer
+      created_at:
+        type: string
+        format: date
+      updated_at:
+        type: string
+        format: date
+  Evaluate:
+    type: object
+    properties:
+      score:
+        type: integer
+      comment: 
+        type: string
+      user_id: 
+        type: integer
+      user_nickname:
+        type: string
+      user_avatar:
+        type: string
       created_at:
         type: string
         format: date
