@@ -1,6 +1,6 @@
 swagger: '2.0'
 info:
-  version: 0.4.0
+  version: 0.5.0
   title: 大学生兼职测试api
   description: 本api只用来给app进行测试用
 host: api.frezc.com
@@ -55,6 +55,35 @@ paths:
           description: 返回新token
           schema:
             type: string
+  /register:
+    post:
+      description: 注册的api
+      parameters:
+        - name: email
+          in: formData
+          description: 用户email
+          required: true
+          type: string
+        - name: password
+          in: formData
+          description: 用户密码
+          required: true
+          type: string
+          format: password
+        - name: nickname
+          in: formData
+          description: 用户名
+          required: true
+          type: string
+      responses:
+        '200':
+          description: 注册成功(未验证)
+          schema:
+            type: string
+        default:
+          description: fail
+          schema:
+            $ref: '#/definitions/ErrorModel'
   '/user/{id}':
     get:
       description: 得到某个用户的信息
@@ -68,6 +97,55 @@ paths:
       responses:
         '200':
           description: 找到用户
+          schema:
+            $ref: '#/definitions/User'
+        default:
+          description: unexpected error
+          schema:
+            $ref: '#/definitions/ErrorModel'
+  /user/update:
+    post:
+      description: 更新用户信息
+      parameters:
+        - name: token
+          in: query
+          description: 登陆得到的token
+          required: true
+          type: string
+        - name: nickname
+          in: formData
+          description: 用户名
+          required: false
+          type: string
+        - name: sex
+          in: formData
+          description: 0:男(default) 1:女
+          required: false
+          type: integer
+        - name: sign
+          in: formData
+          description: 个性签名
+          required: false
+          type: string
+        - name: birthday
+          in: formData
+          description: 生日
+          required: false
+          type: string
+          format: date
+        - name: location
+          in: formData
+          description: 所在地
+          required: false
+          type: string
+        - name: phone
+          in: formData
+          description: 生日
+          required: false
+          type: string
+      responses:
+        '200':
+          description: 更新成功
           schema:
             $ref: '#/definitions/User'
         default:
@@ -586,10 +664,6 @@ paths:
 definitions:
   User:
     type: object
-    required:
-      - email
-      - id
-      - nickname
     properties:
       id:
         type: integer
@@ -610,8 +684,10 @@ definitions:
         type: string
       sex:
         type: integer
-      contact:
+      phone:
         type: string
+      company_id:
+        type: integer
       created_at:
         type: string
         format: date
