@@ -149,7 +149,7 @@ paths:
             $ref: '#/definitions/ErrorModel'
   /getSmsCode:
     get:
-      description: 得到手机验证码，一天有效，一个手机号获取间隔至少1分钟，一天只能获得5次
+      description: 得到手机验证码，一小时有效，一个手机号获取间隔至少1分钟，一天只能获得5次
       parameters:
         - name: phone
           in: query
