@@ -1,9 +1,9 @@
 swagger: '2.0'
 info:
-  version: 0.5.0
+  version: 0.5.2
   title: 大学生兼职测试api
   description: 本api只用来给app进行测试用
-host: api.frezc.com
+host: tjz.frezc.com
 basePath: /
 schemes:
   - http
@@ -15,11 +15,36 @@ paths:
   /auth:
     post:
       description: |
-        登陆，返回用户基本信息和验证TOKEN
+        登陆，返回用户基本信息和验证TOKEN，注意邮箱需要验证后才能使用
       parameters:
         - name: email
           in: formData
           description: 用户邮箱
+          required: true
+          type: string
+        - name: password
+          in: formData
+          description: 密码
+          required: true
+          type: string
+          format: password
+      responses:
+        '200':
+          description: 登陆成功
+          schema:
+            $ref: '#/definitions/Auth'
+        default:
+          description: 登陆失败, 邮箱未验证 状态码430
+          schema:
+            $ref: '#/definitions/ErrorModel'
+  /authPhone:
+    post:
+      description: |
+        登陆，返回用户基本信息和验证TOKEN, 通过手机号登陆，不需要验证邮箱
+      parameters:
+        - name: phone
+          in: formData
+          description: 用户手机号
           required: true
           type: string
         - name: password
@@ -55,6 +80,10 @@ paths:
           description: 返回新token
           schema:
             type: string
+        default:
+          description: fail
+          schema:
+            $ref: '#/definitions/ErrorModel'
   /register:
     post:
       description: 注册的api
@@ -66,18 +95,70 @@ paths:
           type: string
         - name: password
           in: formData
-          description: 用户密码
+          description: 用户密码，6~32位
           required: true
           type: string
           format: password
         - name: nickname
           in: formData
-          description: 用户名
+          description: 用户名，1~16位
           required: true
           type: string
       responses:
         '200':
           description: 注册成功(未验证)
+          schema:
+            type: string
+        default:
+          description: fail
+          schema:
+            $ref: '#/definitions/ErrorModel'
+  /registerByPhone:
+    post:
+      description: 使用手机号注册的api
+      parameters:
+        - name: phone
+          in: formData
+          description: 用户手机号
+          required: true
+          type: string
+        - name: password
+          in: formData
+          description: 用户密码，6~32位
+          required: true
+          type: string
+          format: password
+        - name: nickname
+          in: formData
+          description: 用户名，1~16位
+          required: true
+          type: string
+        - name: verification_code
+          in: formData
+          description: 短信获取的验证码
+          required: true
+          type: string
+      responses:
+        '200':
+          description: 注册成功(未验证)
+          schema:
+            type: string
+        default:
+          description: fail(注意返回的状态码，430:手机号与验证码不符，431:验证码过期)
+          schema:
+            $ref: '#/definitions/ErrorModel'
+  /getSmsCode:
+    get:
+      description: 得到手机验证码，一天有效，一个手机号获取间隔至少1分钟，一天只能获得5次
+      parameters:
+        - name: phone
+          in: query
+          description: 手机号
+          required: true
+          type: string
+      responses:
+        '200':
+          description: 获取成功，验证码会在几秒后发送到手机
           schema:
             type: string
         default:
@@ -163,7 +244,7 @@ paths:
           type: string
         - name: avatar
           in: formData
-          description: 简历的照片文件
+          description: 头像文件
           required: true
           type: string
           format: byte
@@ -198,6 +279,31 @@ paths:
             type: array
             items:
               $ref: '#/definitions/Resume'
+        default:
+          description: unexpected error
+          schema:
+            $ref: '#/definitions/ErrorModel'
+  /resume/photo:
+    get:
+      description: 得到简历的照片(需要登陆验证)
+      parameters:
+        - name: id
+          in: query
+          description: 简历id
+          required: true
+          type: integer
+          format: int64
+        - name: token
+          in: query
+          description: 登陆得到的token
+          required: true
+          type: string
+      responses:
+        '200':
+          description: 照片文件
+          schema:
+            type: string
+            format: byte
         default:
           description: unexpected error
           schema:
@@ -687,6 +793,8 @@ definitions:
       phone:
         type: string
       company_id:
+        type: integer
+      email_verified:
         type: integer
       created_at:
         type: string
