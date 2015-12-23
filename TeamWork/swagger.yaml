@@ -1,6 +1,6 @@
 swagger: '2.0'
 info:
-  version: 0.5.2
+  version: 0.6.2
   title: 大学生兼职测试api
   description: 本api只用来给app进行测试用
 host: tjz.frezc.com
@@ -163,6 +163,103 @@ paths:
             type: string
         default:
           description: fail
+          schema:
+            $ref: '#/definitions/ErrorModel'
+  /bindPhone:
+    post:
+      description: 绑定手机
+      parameters:
+        - name: phone
+          in: formData
+          description: 用户手机号
+          required: true
+          type: string
+        - name: token
+          in: query
+          description: 登陆得到的token
+          required: true
+          type: string
+        - name: verification_code
+          in: formData
+          description: 短信获取的验证码
+          required: true
+          type: string
+      responses:
+        '200':
+          description: 绑定成功
+          schema:
+            type: string
+        default:
+          description: fail(注意返回的状态码，430:手机号与验证码不符，431:验证码过期)
+          schema:
+            $ref: '#/definitions/ErrorModel'
+  /sendVerifyEmail:
+    post:
+      description: 发送验证邮件
+      parameters:
+        - name: email
+          in: formData
+          description: 邮箱
+          required: true
+          type: string
+      responses:
+        '200':
+          description: 获取成功，邮件将会发送到你的邮箱
+          schema:
+            type: string
+        default:
+          description: fail
+          schema:
+            $ref: '#/definitions/ErrorModel'
+  /verifyEmail:
+    post:
+      description: 验证邮箱
+      parameters:
+        - name: email
+          in: formData
+          description: 邮箱
+          required: true
+          type: string
+        - name: token
+          in: formData
+          description: 验证码
+          required: true
+          type: string
+      responses:
+        '200':
+          description: 验证成功
+          schema:
+            type: string
+        default:
+          description: fail(注意返回的状态码，430:邮箱与验证码不符，431:验证码过期)
+          schema:
+            $ref: '#/definitions/ErrorModel'
+  /bindEmail:
+    post:
+      description: 绑定邮箱
+      parameters:
+        - name: email
+          in: formData
+          description: 用户邮箱
+          required: true
+          type: string
+        - name: token
+          in: query
+          description: 登陆得到的token
+          required: true
+          type: string
+        - name: verification_code
+          in: formData
+          description: 邮箱获取的验证码
+          required: true
+          type: string
+      responses:
+        '200':
+          description: 绑定成功
+          schema:
+            type: string
+        default:
+          description: fail(注意返回的状态码，430:邮箱与验证码不符，431:验证码过期)
           schema:
             $ref: '#/definitions/ErrorModel'
   '/user/{id}':
