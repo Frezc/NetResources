@@ -140,7 +140,36 @@ paths:
           type: string
       responses:
         '200':
-          description: 注册成功(未验证)
+          description: 注册成功
+          schema:
+            type: string
+        default:
+          description: fail(注意返回的状态码，430:手机号与验证码不符，431:验证码过期)
+          schema:
+            $ref: '#/definitions/ErrorModel'
+  /resetPassword:
+    post:
+      description: 重置密码，需要绑定手机
+      parameters:
+        - name: phone
+          in: query
+          description: 手机号
+          required: true
+          type: string
+        - name: password
+          in: formData
+          description: 用户密码，6~32位
+          required: true
+          type: string
+          format: password
+        - name: verification_code
+          in: formData
+          description: 短信获取的验证码
+          required: true
+          type: string
+      responses:
+        '200':
+          description: 密码重置成功
           schema:
             type: string
         default:
@@ -220,7 +249,7 @@ paths:
           description: 邮箱
           required: true
           type: string
-        - name: token
+        - name: verification_code
           in: formData
           description: 验证码
           required: true
