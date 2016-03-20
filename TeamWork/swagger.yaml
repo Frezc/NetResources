@@ -152,7 +152,7 @@ paths:
       description: 重置密码，需要绑定手机
       parameters:
         - name: phone
-          in: query
+          in: formData
           description: 手机号
           required: true
           type: string
@@ -584,6 +584,35 @@ paths:
           description: resume updated
           schema:
             $ref: '#/definitions/Resume'
+        default:
+          description: unexpected error
+          schema:
+            $ref: '#/definitions/ErrorModel'
+  /resume/public:
+    post:
+      description: 发布简历，可以让其他人搜到
+      parameters:
+        - name: token
+          in: query
+          description: 登陆获得的auth token
+          required: true
+          type: string
+        - name: resume_id
+          in: formData
+          description: 简历的id
+          required: true
+          type: integer
+          format: int64
+        - name: available_time
+          in: formData
+          description: 可以接受的时间，默认为用户的所有空闲时间
+          required: false
+          type: string
+      responses:
+        '200':
+          description: 发布成功
+          schema:
+            type: string
         default:
           description: unexpected error
           schema:
