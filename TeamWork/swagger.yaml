@@ -1029,13 +1029,40 @@ definitions:
       average_score:
         type: integer
       time:
-        type: string
+        type: array
+        items:
+          $ref: '#/definitions/JobTime'
       company_id:
         type: integer
         format: int64
       company_name:
         type: string
       active:
+        type: integer
+      created_at:
+        type: string
+        format: date
+      updated_at:
+        type: string
+        format: date
+  JobTime:
+    type: object
+    properties:
+      id:
+        type: integer
+      job_id:
+        type: integer
+      year:
+        type: integer
+      month:
+        type: integer
+      dayS:
+        type: integer
+      dayE:
+        type: integer
+      hourS:
+        type: integer
+      hourE:
         type: integer
       created_at:
         type: string
