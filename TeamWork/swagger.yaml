@@ -1,6 +1,6 @@
 swagger: '2.0'
 info:
-  version: 0.6.2
+  version: 0.6.3
   title: 大学生兼职测试api
   description: 本api只用来给app进行测试用
 host: tjz.frezc.com
@@ -64,7 +64,7 @@ paths:
             $ref: '#/definitions/ErrorModel'
   /refresh:
     get:
-      description: token有时效性所以要定时刷新token
+      description: token有时效性(24小时)所以要定时刷新token
       parameters:
         - name: token
           in: query
@@ -73,13 +73,9 @@ paths:
           type: string
       responses:
         '200':
-          headers:
-            Authorization:
-              description: 返回的新token，格式为 Bearer {NEWTOKEN}
-              type: string
-          description: 返回新token
+          description: 返回结果和/auth接口一样
           schema:
-            type: string
+            $ref: '#/definitions/Auth'
         default:
           description: fail
           schema:
@@ -285,6 +281,45 @@ paths:
       responses:
         '200':
           description: 绑定成功
+          schema:
+            type: string
+        default:
+          description: fail(注意返回的状态码，430:邮箱与验证码不符，431:验证码过期)
+          schema:
+            $ref: '#/definitions/ErrorModel'
+  /realNameApply:
+    post:
+      description: 申请实名验证
+      parameters:
+        - name: token
+          in: query
+          description: 登陆得到的token
+          required: true
+          type: string
+        - name: verification_code
+          in: formData
+          description: 短信获取的验证码
+          required: true
+          type: string
+        - name: real_name
+          in: formData
+          description: 真实姓名
+          required: true
+          type: string
+        - name: ID_number
+          in: formData
+          description: 身份证号
+          required: true
+          type: string
+        - name: verifi_pic
+          in: formData
+          description: 验证用的照片
+          required: true
+          type: string
+          format: byte
+      responses:
+        '200':
+          description: 提交申请成功，等待后台处理
           schema:
             type: string
         default:
@@ -922,6 +957,47 @@ paths:
           description: unexpected error
           schema:
             $ref: '#/definitions/ErrorModel'
+            
+  /company/apply:
+    post:
+      description: 评价岗位
+      parameters:
+        - name: token
+          in: query
+          description: 登陆获得的auth token, 需要实名认证
+          required: true
+          type: string
+        - name: name
+          in: formData
+          description: 企业名称
+          required: true
+          type: string
+        - name: location
+          in: formData
+          description: 企业地址
+          required: true
+          type: string
+        - name: phone
+          in: formData
+          description: 电话
+          required: true
+          type: string
+        - name: business_license
+          in: formData
+          description: 营业执照
+          required: true
+          type: string
+          format: byte
+      responses:
+        '200':
+          description: 提交申请成功
+          schema:
+            type: string
+        default:
+          description: unexpected error
+          schema:
+            $ref: '#/definitions/ErrorModel'
+            
 definitions:
   User:
     type: object
