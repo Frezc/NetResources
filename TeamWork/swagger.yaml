@@ -568,12 +568,6 @@ paths:
       tags:
         - 简历模块
       parameters:
-        - name: id
-          in: query
-          description: 简历id
-          required: false
-          type: integer
-          format: int64
         - name: token
           in: query
           description: 登陆得到的token
@@ -581,7 +575,7 @@ paths:
           type: string
       responses:
         '200':
-          description: 简历详情
+          description: 得到所有简历
           schema:
             type: array
             items:
