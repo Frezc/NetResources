@@ -16,6 +16,8 @@ paths:
     post:
       description: |
         登陆，返回用户基本信息和验证TOKEN，注意邮箱需要验证后才能使用
+      tags:
+        - 基本验证
       parameters:
         - name: email
           in: formData
@@ -41,6 +43,8 @@ paths:
     post:
       description: |
         登陆，返回用户基本信息和验证TOKEN, 通过手机号登陆，不需要验证邮箱
+      tags:
+        - 基本验证
       parameters:
         - name: phone
           in: formData
@@ -65,6 +69,8 @@ paths:
   /refresh:
     get:
       description: token有时效性(24小时)所以要定时刷新token
+      tags:
+        - 基本验证
       parameters:
         - name: token
           in: query
@@ -83,6 +89,8 @@ paths:
   /register:
     post:
       description: 注册的api
+      tags:
+        - 基本验证
       parameters:
         - name: email
           in: formData
@@ -112,6 +120,8 @@ paths:
   /registerByPhone:
     post:
       description: 使用手机号注册的api
+      tags:
+        - 基本验证
       parameters:
         - name: phone
           in: formData
@@ -146,6 +156,8 @@ paths:
   /resetPassword:
     post:
       description: 重置密码，需要绑定手机
+      tags:
+        - 基本验证
       parameters:
         - name: phone
           in: formData
@@ -175,6 +187,8 @@ paths:
   /getSmsCode:
     get:
       description: 得到手机验证码，一小时有效，一个手机号获取间隔至少1分钟，一天只能获得5次
+      tags:
+        - 基本验证
       parameters:
         - name: phone
           in: query
@@ -193,6 +207,8 @@ paths:
   /bindPhone:
     post:
       description: 绑定手机
+      tags:
+        - 基本验证
       parameters:
         - name: phone
           in: formData
@@ -221,6 +237,8 @@ paths:
   /sendVerifyEmail:
     post:
       description: 发送验证邮件
+      tags:
+        - 基本验证
       parameters:
         - name: email
           in: formData
@@ -239,6 +257,8 @@ paths:
   /verifyEmail:
     post:
       description: 验证邮箱
+      tags:
+        - 基本验证
       parameters:
         - name: email
           in: formData
@@ -262,6 +282,8 @@ paths:
   /bindEmail:
     post:
       description: 绑定邮箱
+      tags:
+        - 基本验证
       parameters:
         - name: email
           in: formData
@@ -287,48 +309,12 @@ paths:
           description: fail(注意返回的状态码，430:邮箱与验证码不符，431:验证码过期)
           schema:
             $ref: '#/definitions/ErrorModel'
-  /realNameApply:
-    post:
-      description: 申请实名验证
-      parameters:
-        - name: token
-          in: query
-          description: 登陆得到的token
-          required: true
-          type: string
-        - name: verification_code
-          in: formData
-          description: 短信获取的验证码
-          required: true
-          type: string
-        - name: real_name
-          in: formData
-          description: 真实姓名
-          required: true
-          type: string
-        - name: ID_number
-          in: formData
-          description: 身份证号
-          required: true
-          type: string
-        - name: verifi_pic
-          in: formData
-          description: 验证用的照片
-          required: true
-          type: string
-          format: byte
-      responses:
-        '200':
-          description: 提交申请成功，等待后台处理
-          schema:
-            type: string
-        default:
-          description: fail(注意返回的状态码，430:邮箱与验证码不符，431:验证码过期)
-          schema:
-            $ref: '#/definitions/ErrorModel'
-  '/user/{id}':
+            
+  /user/{id}:
     get:
       description: 得到某个用户的信息
+      tags:
+        - 用户模块
       parameters:
         - name: id
           in: path
@@ -348,6 +334,8 @@ paths:
   /user/update:
     post:
       description: 更新用户信息
+      tags:
+        - 用户模块
       parameters:
         - name: token
           in: query
@@ -397,6 +385,8 @@ paths:
   /avatar:
     post:
       description: 更新用户头像
+      tags:
+        - 用户模块
       parameters:
         - name: token
           in: query
@@ -417,10 +407,166 @@ paths:
         default:
           description: unexpected error
           schema:
+            $ref: '#/definitions/ErrorModel'       
+  /realNameApply:
+    post:
+      description: 申请实名验证
+      tags:
+        - 用户模块
+      parameters:
+        - name: token
+          in: query
+          description: 登陆得到的token
+          required: true
+          type: string
+        - name: verification_code
+          in: formData
+          description: 短信获取的验证码
+          required: true
+          type: string
+        - name: real_name
+          in: formData
+          description: 真实姓名
+          required: true
+          type: string
+        - name: ID_number
+          in: formData
+          description: 身份证号
+          required: true
+          type: string
+        - name: verifi_pic
+          in: formData
+          description: 验证用的照片
+          required: true
+          type: string
+          format: byte
+      responses:
+        '200':
+          description: 提交申请成功，等待后台处理
+          schema:
+            type: string
+        default:
+          description: fail(注意返回的状态码，430:邮箱与验证码不符，431:验证码过期)
+          schema:
             $ref: '#/definitions/ErrorModel'
+  /job/completed:
+    get:
+      description: 已完成的工作
+      tags:
+        - 用户模块
+      parameters:
+        - name: token
+          in: query
+          description: 登陆获得的auth token
+          required: true
+          type: string
+        - name: is_evaluated
+          in: query
+          description: 是否已评价(0:未评价, 1:已评价)
+          required: false
+          type: integer
+        - name: direction
+          in: query
+          description: "按时间升序('asc')or降序('desc'), 默认升序"
+          required: false
+          type: string
+        - name: offset
+          in: query
+          description: 查找结果的偏移量（用来分页）
+          required: false
+          type: integer
+          format: int32
+        - name: limit
+          in: query
+          description: 最多返回的结果
+          required: true
+          type: integer
+          format: int32
+      responses:
+        '200':
+          description: 返回搜索的所有已完成岗位
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/JobCompleted'
+        default:
+          description: unexpected error
+          schema:
+            $ref: '#/definitions/ErrorModel'
+  /job/evaluate:
+    get: 
+      description: 得到岗位的评价
+      tags:
+        - 岗位模块
+      parameters:
+        - name: job_id
+          in: query
+          description: 岗位id
+          required: true
+          type: integer
+        - name: offset
+          in: query
+          description: 查找结果的偏移量（用来分页）
+          required: false
+          type: integer
+          format: int32
+        - name: limit
+          in: query
+          description: 最多返回的结果
+          required: true
+          type: integer
+          format: int32
+      responses:
+        '200':
+          description: 查找到的评价
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Evaluate'
+        default:
+          description: unexpected error
+          schema:
+            $ref: '#/definitions/ErrorModel'
+    post:
+      description: 评价岗位
+      tags:
+        - 用户模块
+      parameters:
+        - name: token
+          in: query
+          description: 登陆获得的auth token
+          required: true
+          type: string
+        - name: job_completed_id
+          in: query
+          description: 完成的工作id
+          required: true
+          type: integer
+        - name: score
+          in: formData
+          description: 评分(0~5)
+          required: true
+          type: integer
+        - name: comment
+          in: formData
+          description: 评论
+          required: false
+          type: string
+      responses:
+        '200':
+          description: 评价成功
+          schema:
+            type: string
+        default:
+          description: unexpected error
+          schema:
+            $ref: '#/definitions/ErrorModel'
+  
   /resume:
     get:
       description: 得到某份简历
+      tags:
+        - 简历模块
       parameters:
         - name: id
           in: query
@@ -447,6 +593,8 @@ paths:
   /resume/photo:
     get:
       description: 得到简历的照片(需要登陆验证)
+      tags:
+        - 简历模块
       parameters:
         - name: id
           in: query
@@ -472,6 +620,8 @@ paths:
   /resume/delete:
     post:
       description: 删除简历
+      tags:
+        - 简历模块
       parameters:
         - name: id
           in: query
@@ -498,6 +648,8 @@ paths:
       description: 添加简历
       consumes:
         - multipart/form-data
+      tags:
+        - 简历模块
       parameters:
         - name: title
           in: formData
@@ -560,6 +712,8 @@ paths:
       description: 修改简历
       consumes:
         - multipart/form-data
+      tags:
+        - 简历模块
       parameters:
         - name: title
           in: formData
@@ -626,6 +780,8 @@ paths:
   /resume/public:
     post:
       description: 发布简历，可以让其他人搜到
+      tags:
+        - 简历模块
       parameters:
         - name: token
           in: query
@@ -652,9 +808,12 @@ paths:
           description: unexpected error
           schema:
             $ref: '#/definitions/ErrorModel'
+            
   '/job/{id}':
     get:
       description: 查找岗位
+      tags:
+        - 岗位模块
       parameters:
         - name: id
           in: path
@@ -674,6 +833,8 @@ paths:
   /job/query:
     get:
       description: 查找岗位
+      tags:
+        - 岗位模块
       parameters:
         - name: q
           in: query
@@ -716,6 +877,8 @@ paths:
   /job/apply:
     get:
       description: 申请中的岗位
+      tags:
+        - 岗位模块
       parameters:
         - name: token
           in: query
@@ -757,6 +920,8 @@ paths:
             $ref: '#/definitions/ErrorModel'
     post:
       description: 创建申请
+      tags:
+        - 岗位模块
       parameters:
         - name: token
           in: query
@@ -789,116 +954,12 @@ paths:
           description: unexpected error
           schema:
             $ref: '#/definitions/ErrorModel'
-  /job/completed:
-    get:
-      description: 已完成的工作
-      parameters:
-        - name: token
-          in: query
-          description: 登陆获得的auth token
-          required: true
-          type: string
-        - name: is_evaluated
-          in: query
-          description: 是否已评价(0:未评价, 1:已评价)
-          required: false
-          type: integer
-        - name: direction
-          in: query
-          description: "按时间升序('asc')or降序('desc'), 默认升序"
-          required: false
-          type: string
-        - name: offset
-          in: query
-          description: 查找结果的偏移量（用来分页）
-          required: false
-          type: integer
-          format: int32
-        - name: limit
-          in: query
-          description: 最多返回的结果
-          required: true
-          type: integer
-          format: int32
-      responses:
-        '200':
-          description: 返回搜索的所有已完成岗位
-          schema:
-            type: array
-            items:
-              $ref: '#/definitions/JobCompleted'
-        default:
-          description: unexpected error
-          schema:
-            $ref: '#/definitions/ErrorModel'
-  /job/evaluate:
-    get: 
-      description: 得到岗位的评价
-      parameters:
-        - name: job_id
-          in: query
-          description: 岗位id
-          required: true
-          type: integer
-        - name: offset
-          in: query
-          description: 查找结果的偏移量（用来分页）
-          required: false
-          type: integer
-          format: int32
-        - name: limit
-          in: query
-          description: 最多返回的结果
-          required: true
-          type: integer
-          format: int32
-      responses:
-        '200':
-          description: 查找到的评价
-          schema:
-            type: array
-            items:
-              $ref: '#/definitions/Evaluate'
-        default:
-          description: unexpected error
-          schema:
-            $ref: '#/definitions/ErrorModel'
-    post:
-      description: 评价岗位
-      parameters:
-        - name: token
-          in: query
-          description: 登陆获得的auth token
-          required: true
-          type: string
-        - name: job_completed_id
-          in: query
-          description: 完成的工作id
-          required: true
-          type: integer
-        - name: score
-          in: formData
-          description: 评分(0~5)
-          required: true
-          type: integer
-        - name: comment
-          in: formData
-          description: 评论
-          required: false
-          type: string
-      responses:
-        '200':
-          description: 评价成功
-          schema:
-            type: string
-        default:
-          description: unexpected error
-          schema:
-            $ref: '#/definitions/ErrorModel'
-      
+  
   '/company/{id}':
     get:
       description: 公司信息
+      tags:
+        - 商家模块
       parameters:
         - name: id
           in: path
@@ -918,6 +979,8 @@ paths:
   /company/query:
     get:
       description: 搜索公司
+      tags:
+        - 商家模块
       parameters:
         - name: q
           in: query
@@ -957,10 +1020,11 @@ paths:
           description: unexpected error
           schema:
             $ref: '#/definitions/ErrorModel'
-            
   /company/apply:
     post:
-      description: 评价岗位
+      description: 申请商家认证
+      tags:
+        - 商家模块
       parameters:
         - name: token
           in: query
@@ -991,6 +1055,26 @@ paths:
       responses:
         '200':
           description: 提交申请成功
+          schema:
+            type: string
+        default:
+          description: unexpected error
+          schema:
+            $ref: '#/definitions/ErrorModel'
+            
+  /upload/image:
+    post: 
+      description: 上传图片
+      tags:
+        - 其他模块
+      parameters:
+        - name: file
+          in: formData
+          required: true
+          type: file
+      responses:
+        '200':
+          description: 上传成功，返回图片对应的url
           schema:
             type: string
         default:
