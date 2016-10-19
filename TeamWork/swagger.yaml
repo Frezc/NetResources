@@ -1,8 +1,10 @@
 swagger: '2.0'
 info:
-  version: 0.6.3
-  title: 大学生兼职测试api
-  description: 本api只用来给app进行测试用
+  version: 0.7.0
+  title: 淘兼职api
+  description: |
+    Admin标签代表只能管理员使用;  
+    Auth标签代表需要在请求里带上获得的token（见https://github.com/tymondesigns/jwt-auth/wiki/Authentication ）
 host: tjz.frezc.com
 basePath: /
 schemes:
@@ -209,6 +211,7 @@ paths:
       description: 绑定手机
       tags:
         - 基本验证
+        - Auth
       parameters:
         - name: phone
           in: formData
@@ -284,6 +287,7 @@ paths:
       description: 绑定邮箱
       tags:
         - 基本验证
+        - Auth
       parameters:
         - name: email
           in: formData
@@ -309,8 +313,41 @@ paths:
           description: fail(注意返回的状态码，430:邮箱与验证码不符，431:验证码过期)
           schema:
             $ref: '#/definitions/ErrorModel'
-            
-  /user/{id}:
+
+  /users:
+    get:
+      description: 搜索对应的用户信息
+      tags:
+        - Admin
+      parameters:
+        - name: kw
+          in: query
+          description: 关键字
+          required: false
+          type: string
+        - name: dir
+          in: query
+          description: "升序('asc')or降序('desc'), 默认升序"
+          required: false
+          type: string
+        - name: off
+          in: query
+          description: 查找结果的偏移量（用来分页）
+          required: false
+          type: integer
+        - name: siz
+          in: query
+          description: 最多返回的结果
+          required: false
+          type: integer
+      responses:
+        200:
+          description: 返回对应的用户列表
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/User'
+  /users/{id}:
     get:
       description: 得到某个用户的信息
       tags:
@@ -331,7 +368,6 @@ paths:
           description: unexpected error
           schema:
             $ref: '#/definitions/ErrorModel'
-  /user/update:
     post:
       description: 更新用户信息
       tags:
@@ -342,6 +378,12 @@ paths:
           description: 登陆得到的token
           required: true
           type: string
+        - name: id
+          in: path
+          description: 用户的id
+          required: true
+          type: integer
+          format: int64
         - name: nickname
           in: formData
           description: 用户名
@@ -368,9 +410,9 @@ paths:
           description: 所在地
           required: false
           type: string
-        - name: phone
+        - name: avatar
           in: formData
-          description: 生日
+          description: 头像
           required: false
           type: string
       responses:
@@ -382,32 +424,6 @@ paths:
           description: unexpected error
           schema:
             $ref: '#/definitions/ErrorModel'
-  /avatar:
-    post:
-      description: 更新用户头像
-      tags:
-        - 用户模块
-      parameters:
-        - name: token
-          in: query
-          description: 登陆得到的token
-          required: true
-          type: string
-        - name: avatar
-          in: formData
-          description: 头像文件
-          required: true
-          type: string
-          format: byte
-      responses:
-        '200':
-          description: '修改成功,返回头像的url'
-          schema:
-            type: string
-        default:
-          description: unexpected error
-          schema:
-            $ref: '#/definitions/ErrorModel'       
   /realNameApply:
     post:
       description: 申请实名验证
@@ -465,23 +481,21 @@ paths:
           description: 是否已评价(0:未评价, 1:已评价)
           required: false
           type: integer
-        - name: direction
+        - name: dir
           in: query
           description: "按时间升序('asc')or降序('desc'), 默认升序"
           required: false
           type: string
-        - name: offset
+        - name: off
           in: query
           description: 查找结果的偏移量（用来分页）
           required: false
           type: integer
-          format: int32
-        - name: limit
+        - name: siz
           in: query
           description: 最多返回的结果
-          required: true
+          required: false
           type: integer
-          format: int32
       responses:
         '200':
           description: 返回搜索的所有已完成岗位
@@ -504,18 +518,16 @@ paths:
           description: 岗位id
           required: true
           type: integer
-        - name: offset
+        - name: off
           in: query
           description: 查找结果的偏移量（用来分页）
           required: false
           type: integer
-          format: int32
-        - name: limit
+        - name: siz
           in: query
           description: 最多返回的结果
-          required: true
+          required: false
           type: integer
-          format: int32
       responses:
         '200':
           description: 查找到的评价
@@ -562,7 +574,7 @@ paths:
           schema:
             $ref: '#/definitions/ErrorModel'
   
-  /resume:
+  /resumes:
     get:
       description: 得到某份简历
       tags:
@@ -575,7 +587,7 @@ paths:
           type: string
       responses:
         '200':
-          description: 得到所有简历
+          description: 简历详情
           schema:
             type: array
             items:
@@ -584,60 +596,6 @@ paths:
           description: unexpected error
           schema:
             $ref: '#/definitions/ErrorModel'
-  /resume/photo:
-    get:
-      description: 得到简历的照片(需要登陆验证)
-      tags:
-        - 简历模块
-      parameters:
-        - name: id
-          in: query
-          description: 简历id
-          required: true
-          type: integer
-          format: int64
-        - name: token
-          in: query
-          description: 登陆得到的token
-          required: true
-          type: string
-      responses:
-        '200':
-          description: 照片文件
-          schema:
-            type: string
-            format: byte
-        default:
-          description: unexpected error
-          schema:
-            $ref: '#/definitions/ErrorModel'
-  /resume/delete:
-    post:
-      description: 删除简历
-      tags:
-        - 简历模块
-      parameters:
-        - name: id
-          in: query
-          description: 简历id
-          required: true
-          type: integer
-          format: int64
-        - name: token
-          in: query
-          description: 登陆获得的token
-          required: true
-          type: string
-      responses:
-        '200':
-          description: deleted
-          schema:
-            type: string
-        default:
-          description: unexpected error
-          schema:
-            $ref: '#/definitions/ErrorModel'
-  /resume/add:
     post:
       description: 添加简历
       consumes:
@@ -655,6 +613,11 @@ paths:
           description: 简历里的姓名
           required: true
           type: string
+        - name: sex
+          in: formData
+          description: 性别（0：男，1：女），默认0
+          required: false
+          type: integer
         - name: school
           in: formData
           description: 学校
@@ -670,7 +633,6 @@ paths:
           description: 简历的照片文件
           required: false
           type: string
-          format: byte
         - name: birthday
           in: formData
           description: 生日
@@ -701,7 +663,32 @@ paths:
           description: unexpected error
           schema:
             $ref: '#/definitions/ErrorModel'
-  /resume/update:
+  /resumes/{id}:
+    delete:
+      description: 删除简历
+      tags:
+        - 简历模块
+      parameters:
+        - name: id
+          in: path
+          description: 简历id
+          required: true
+          type: integer
+          format: int64
+        - name: token
+          in: query
+          description: 登陆获得的token
+          required: true
+          type: string
+      responses:
+        '200':
+          description: deleted
+          schema:
+            type: string
+        default:
+          description: unexpected error
+          schema:
+            $ref: '#/definitions/ErrorModel'
     post:
       description: 修改简历
       consumes:
@@ -709,6 +696,12 @@ paths:
       tags:
         - 简历模块
       parameters:
+        - name: id
+          in: path
+          description: 简历id
+          required: true
+          type: integer
+          format: int64
         - name: title
           in: formData
           description: 简历标题
@@ -734,7 +727,6 @@ paths:
           description: 简历的照片文件
           required: false
           type: string
-          format: byte
         - name: birthday
           in: formData
           description: 生日
@@ -751,12 +743,6 @@ paths:
           description: 期望工作地点
           required: false
           type: string
-        - name: id
-          description: 要修改简历的id
-          in: query
-          required: true
-          type: integer
-          format: int64
         - name: token
           in: query
           description: 登陆获得的auth token
@@ -802,8 +788,7 @@ paths:
           description: unexpected error
           schema:
             $ref: '#/definitions/ErrorModel'
-            
-  '/job/{id}':
+  /jobs/{id}:
     get:
       description: 查找岗位
       tags:
@@ -824,7 +809,7 @@ paths:
           description: unexpected error
           schema:
             $ref: '#/definitions/ErrorModel'
-  /job/query:
+  /jobs:
     get:
       description: 查找岗位
       tags:
@@ -886,7 +871,7 @@ paths:
           type: integer
         - name: direction
           in: query
-          description: "按时间升序('asc')or降序('desc'), 默认升序"
+          description: "按时间升序('asc')or降序('desc'), 默认降序"
           required: false
           type: string
         - name: offset
@@ -898,7 +883,7 @@ paths:
         - name: limit
           in: query
           description: 最多返回的结果
-          required: true
+          required: false
           type: integer
           format: int32
       responses:
@@ -949,7 +934,7 @@ paths:
           schema:
             $ref: '#/definitions/ErrorModel'
   
-  '/company/{id}':
+  /companies/{id}:
     get:
       description: 公司信息
       tags:
@@ -970,7 +955,7 @@ paths:
           description: unexpected error
           schema:
             $ref: '#/definitions/ErrorModel'
-  /company/query:
+  /companies:
     get:
       description: 搜索公司
       tags:
@@ -999,8 +984,8 @@ paths:
           format: int32
         - name: limit
           in: query
-          description: 最多返回的结果
-          required: true
+          description: 最多返回的结果, 默认20
+          required: false
           type: integer
           format: int32
       responses:
@@ -1014,9 +999,8 @@ paths:
           description: unexpected error
           schema:
             $ref: '#/definitions/ErrorModel'
-  /company/apply:
     post:
-      description: 申请商家认证
+      description: 创建公司（需审核）。
       tags:
         - 商家模块
       parameters:
@@ -1045,7 +1029,6 @@ paths:
           description: 营业执照
           required: true
           type: string
-          format: byte
       responses:
         '200':
           description: 提交申请成功
@@ -1062,6 +1045,11 @@ paths:
       tags:
         - 其他模块
       parameters:
+        - name: token
+          in: query
+          description: 登陆获得的auth token, 需要实名认证
+          required: true
+          type: string
         - name: file
           in: formData
           required: true
@@ -1070,7 +1058,7 @@ paths:
         '200':
           description: 上传成功，返回图片对应的url
           schema:
-            type: string
+            $ref: '#/definitions/UploadSuccess'
         default:
           description: unexpected error
           schema:
@@ -1328,6 +1316,11 @@ definitions:
       updated_at:
         type: string
         format: date
+  UploadSuccess:
+    type: object
+    properties:
+      file:
+        type: string
   ErrorModel:
     type: object
     properties:
