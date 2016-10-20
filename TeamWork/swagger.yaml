@@ -218,11 +218,6 @@ paths:
           description: 用户手机号
           required: true
           type: string
-        - name: token
-          in: query
-          description: 登陆得到的token
-          required: true
-          type: string
         - name: verification_code
           in: formData
           description: 短信获取的验证码
@@ -294,11 +289,6 @@ paths:
           description: 用户邮箱
           required: true
           type: string
-        - name: token
-          in: query
-          description: 登陆得到的token
-          required: true
-          type: string
         - name: verification_code
           in: formData
           description: 邮箱获取的验证码
@@ -358,7 +348,6 @@ paths:
           description: 用户的id
           required: true
           type: integer
-          format: int64
       responses:
         '200':
           description: 找到用户
@@ -372,12 +361,8 @@ paths:
       description: 更新用户信息
       tags:
         - 用户模块
+        - Auth
       parameters:
-        - name: token
-          in: query
-          description: 登陆得到的token
-          required: true
-          type: string
         - name: id
           in: path
           description: 用户的id
@@ -429,12 +414,8 @@ paths:
       description: 申请实名验证
       tags:
         - 用户模块
+        - Auth
       parameters:
-        - name: token
-          in: query
-          description: 登陆得到的token
-          required: true
-          type: string
         - name: verification_code
           in: formData
           description: 短信获取的验证码
@@ -470,12 +451,8 @@ paths:
       description: 已完成的工作
       tags:
         - 用户模块
+        - Auth
       parameters:
-        - name: token
-          in: query
-          description: 登陆获得的auth token
-          required: true
-          type: string
         - name: is_evaluated
           in: query
           description: 是否已评价(0:未评价, 1:已评价)
@@ -543,12 +520,8 @@ paths:
       description: 评价岗位
       tags:
         - 用户模块
+        - Auth
       parameters:
-        - name: token
-          in: query
-          description: 登陆获得的auth token
-          required: true
-          type: string
         - name: job_completed_id
           in: query
           description: 完成的工作id
@@ -574,17 +547,18 @@ paths:
           schema:
             $ref: '#/definitions/ErrorModel'
   
-  /resumes:
+  /users/{id}/resumes:
     get:
       description: 得到某份简历
       tags:
         - 简历模块
-      parameters:
-        - name: token
-          in: query
-          description: 登陆得到的token
+        - Auth
+      parameters: 
+        - name: id
+          in: path
+          description: 用户的id
           required: true
-          type: string
+          type: integer
       responses:
         '200':
           description: 简历详情
@@ -602,7 +576,13 @@ paths:
         - multipart/form-data
       tags:
         - 简历模块
+        - Auth
       parameters:
+        - name: id
+          in: path
+          description: 用户的id
+          required: true
+          type: integer
         - name: title
           in: formData
           description: 简历标题
@@ -649,11 +629,6 @@ paths:
           description: 期望工作地点
           required: false
           type: string
-        - name: token
-          in: query
-          description: 登陆获得的auth token
-          required: true
-          type: string
       responses:
         '201':
           description: resume created
@@ -663,28 +638,28 @@ paths:
           description: unexpected error
           schema:
             $ref: '#/definitions/ErrorModel'
-  /resumes/{id}:
+  /users/{id}/resumes/{resumeId}:
     delete:
       description: 删除简历
       tags:
         - 简历模块
+        - Auth
       parameters:
         - name: id
+          in: path
+          description: 用户id
+          required: true
+          type: integer
+        - name: resumeId
           in: path
           description: 简历id
           required: true
           type: integer
-          format: int64
-        - name: token
-          in: query
-          description: 登陆获得的token
-          required: true
-          type: string
       responses:
-        '200':
+        200:
           description: deleted
           schema:
-            type: string
+            $ref: '#/definitions/Resume'
         default:
           description: unexpected error
           schema:
@@ -695,13 +670,18 @@ paths:
         - multipart/form-data
       tags:
         - 简历模块
+        - Auth
       parameters:
         - name: id
+          in: path
+          description: 用户id
+          required: true
+          type: integer
+        - name: resumeId
           in: path
           description: 简历id
           required: true
           type: integer
-          format: int64
         - name: title
           in: formData
           description: 简历标题
@@ -743,11 +723,6 @@ paths:
           description: 期望工作地点
           required: false
           type: string
-        - name: token
-          in: query
-          description: 登陆获得的auth token
-          required: true
-          type: string
       responses:
         '200':
           description: resume updated
@@ -762,12 +737,8 @@ paths:
       description: 发布简历，可以让其他人搜到
       tags:
         - 简历模块
+        - Auth
       parameters:
-        - name: token
-          in: query
-          description: 登陆获得的auth token
-          required: true
-          type: string
         - name: resume_id
           in: formData
           description: 简历的id
@@ -799,7 +770,6 @@ paths:
           description: 岗位id
           required: true
           type: integer
-          format: int64
       responses:
         '200':
           description: 返回岗位详情
@@ -815,7 +785,7 @@ paths:
       tags:
         - 岗位模块
       parameters:
-        - name: q
+        - name: kw
           in: query
           description: 关键字(用空格分开)
           required: true
@@ -825,23 +795,21 @@ paths:
           description: '按某列进行排序(id, created_at, number), 默认id'
           required: false
           type: string
-        - name: direction
+        - name: dir
           in: query
           description: "升序('asc')or降序('desc'), 默认升序"
           required: false
           type: string
-        - name: offset
+        - name: off
           in: query
           description: 查找结果的偏移量（用来分页）
           required: false
           type: integer
-          format: int32
-        - name: limit
+        - name: siz
           in: query
           description: 最多返回的结果
           required: true
           type: integer
-          format: int32
       responses:
         '200':
           description: 返回搜索的所有岗位
@@ -858,34 +826,28 @@ paths:
       description: 申请中的岗位
       tags:
         - 岗位模块
+        - Auth
       parameters:
-        - name: token
-          in: query
-          description: 登陆获得的auth token
-          required: true
-          type: string
         - name: status
           in: query
           description: 根据申请状态进行筛选(0:申请中，1:申请成功，2:申请失败，该项为空或其他参数表示不筛选)
           required: false
           type: integer
-        - name: direction
+        - name: dir
           in: query
           description: "按时间升序('asc')or降序('desc'), 默认降序"
           required: false
           type: string
-        - name: offset
+        - name: off
           in: query
           description: 查找结果的偏移量（用来分页）
           required: false
           type: integer
-          format: int32
-        - name: limit
+        - name: siz
           in: query
           description: 最多返回的结果
           required: false
           type: integer
-          format: int32
       responses:
         '200':
           description: 返回搜索的所有岗位申请
@@ -901,12 +863,8 @@ paths:
       description: 创建申请
       tags:
         - 岗位模块
+        - Auth
       parameters:
-        - name: token
-          in: query
-          description: 登陆获得的auth token
-          required: true
-          type: string
         - name: job_id
           in: formData
           description: 申请的岗位id
@@ -945,7 +903,6 @@ paths:
           description: 岗位id
           required: true
           type: integer
-          format: int64
       responses:
         '200':
           description: 返回公司的详情信息
@@ -961,7 +918,7 @@ paths:
       tags:
         - 商家模块
       parameters:
-        - name: q
+        - name: kw
           in: query
           description: 关键字(用空格分开)
           required: true
@@ -971,23 +928,21 @@ paths:
           description: '按某列进行排序(id, created_at), 默认id'
           required: false
           type: string
-        - name: direction
+        - name: dir
           in: query
           description: "升序('asc')or降序('desc'), 默认升序"
           required: false
           type: string
-        - name: offset
+        - name: off
           in: query
           description: '查找结果的偏移量(用来分页),'
           required: false
           type: integer
-          format: int32
-        - name: limit
+        - name: siz
           in: query
           description: 最多返回的结果, 默认20
           required: false
           type: integer
-          format: int32
       responses:
         '200':
           description: 返回搜索的所有公司信息
@@ -1003,12 +958,8 @@ paths:
       description: 创建公司（需审核）。
       tags:
         - 商家模块
+        - Auth
       parameters:
-        - name: token
-          in: query
-          description: 登陆获得的auth token, 需要实名认证
-          required: true
-          type: string
         - name: name
           in: formData
           description: 企业名称
@@ -1044,12 +995,8 @@ paths:
       description: 上传图片
       tags:
         - 其他模块
+        - Auth
       parameters:
-        - name: token
-          in: query
-          description: 登陆获得的auth token, 需要实名认证
-          required: true
-          type: string
         - name: file
           in: formData
           required: true
